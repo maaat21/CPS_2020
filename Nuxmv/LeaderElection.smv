@@ -1,0 +1,87 @@
+-- nuxmv -int
+-- read_model -i LeaderElection.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 10
+-- nuxmv LeaderElection.smv for requirement verification
+
+
+MODULE main
+
+VAR
+    nwk: Network(n0.out, n1.out ,n2.out ,n3.out);
+    n0: Node(3, nwk.o[0], 4);
+	n1: Node(4, nwk.o[1], 4);
+	n2: Node(1, nwk.o[2], 4);
+	n3: Node(2, nwk.o[3], 4);
+
+LTLSPEC
+	F(G(n0.status = lead | n1.status = lead | n2.status = lead | n3.status = lead))
+		
+LTLSPEC
+	F(G(toint(n0.leader) + toint(n1.leader) + toint(n2.leader) + toint(n3.leader) = 1))
+
+LTLSPEC
+	G(n0.status = lead -> G(n1.status != lead & n2.status != lead & n3.status != lead))
+LTLSPEC
+	G(n1.status = lead -> G(n0.status != lead & n2.status != lead & n3.status != lead))
+LTLSPEC
+	G(n2.status = lead -> G(n0.status != lead & n1.status != lead & n3.status != lead))
+LTLSPEC
+	G(n3.status = lead -> G(n0.status != lead & n1.status != lead & n2.status != lead))
+
+MODULE Node(myId, inp, N)
+		
+VAR
+	id: 1..4;
+	status: {lead, fol, undec};
+	r: 0..4;
+	leader: boolean;
+
+ASSIGN
+	init(r):= 0;
+	init(status):= undec;
+	init(id):= myId;
+	init(leader):= FALSE;
+
+next(r):= (r+1) mod 4;		
+	next(id):=
+		case
+			id < maxinp : maxinp;
+			TRUE : id;
+		esac;
+				
+	next(status):=
+		case
+			next(id) > id : fol;
+			next(r) = 3 & next(id) = myId : lead;
+			TRUE : status;
+		esac;
+					
+	next(leader):=
+		case
+			next(r) = 3 & next(id) = myId : TRUE;
+			TRUE : leader;
+		esac;
+
+DEFINE
+		out:= id;
+		maxinp:= max(max(inp[0], inp[1]), inp[2]);
+
+		
+MODULE Network(i0, i1, i2, i3)
+
+VAR
+	o[0]: array 0..2 of 1..4;
+	o[1]: array 0..2 of 1..4;
+	o[2]: array 0..2 of 1..4;
+	o[3]: array 0..2 of 1..4;
+
+ASSIGN
+	o[0][0]:=i1;
+	o[1][0]:=i2;
+	o[1][1]:=i3;
+	o[2][0]:=i0;
+	o[2][1]:=i3;
+	o[3][0]:=i2;
+	o[3][1]:=i1;

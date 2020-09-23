@@ -1,0 +1,56 @@
+-- nuxmv -int
+-- read_model ThreeBitCounter.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 10
+-- nuxmv ThreeBitCounter.smv for requirement verification
+
+MODULE main
+
+VAR
+  tbc: ThreeBitCounter(inc, start);
+  inc: boolean;
+  start: boolean;		
+		
+SPEC
+   AG (start -> AX(tbc.out=0)); -- Remove the first AG means, it may happen that...
+SPEC
+   AG (tbc.out=7 -> AX(tbc.out=0)); -- Without inc, stays there forever...
+
+LTLSPEC
+   G (G(F(inc)) -> F(tbc.out=0)); -- Either though inc or through reset (start). -- Remove the first G means, it may happen that...
+
+LTLSPEC
+   G (G(F(inc)) -> F(tbc.out=7));
+LTLSPEC
+   G (G(!start & F(inc)) -> F(tbc.out=7));
+
+
+MODULE OneBitCounter(inc, start)
+
+VAR
+	x: boolean;
+
+ASSIGN
+	init(x):= FALSE;
+			
+    next(x):=
+		case
+			start: FALSE;
+			TRUE: x xor inc;
+		esac;
+				
+DEFINE
+	cout:= x & inc; -- Await dependency is necessary
+	out:= x;
+
+			
+MODULE ThreeBitCounter(inc, start)
+
+VAR
+	bit[0]: OneBitCounter(inc, start);
+	bit[1]: OneBitCounter(bit[0].cout, start);
+	bit[2]: OneBitCounter(bit[1].cout, start);
+
+DEFINE
+    out:= toint(bit[0].out) + 2*toint(bit[1].out) + 4*toint(bit[2].out);

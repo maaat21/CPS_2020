@@ -1,0 +1,20 @@
+-- nuxmv -int LossyDelay.smv
+-- read_model -i LossyDelay.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 10
+-- nuxmv LossyDelay.smv for requirement verification
+-- reset
+
+MODULE main
+
+VAR
+	x : 0..2;
+   inp : 0..1;
+
+ASSIGN
+	init(x):= 0;
+   next(x):= {inp, x};
+
+DEFINE
+	out := x;

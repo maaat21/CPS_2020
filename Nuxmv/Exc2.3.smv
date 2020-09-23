@@ -1,0 +1,48 @@
+-- nuxmv -int
+-- read_model -i Exc2.3.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -i -k 20
+-- nuxmv Exc2.3.smv for requirement verification
+
+MODULE main
+VAR
+x: boolean;
+y: boolean;
+reset: boolean;
+
+mode: {wait, waitx, waity, waitr};
+
+ASSIGN
+  init(mode):= wait;
+		
+		next(mode):=
+		case
+				mode=waitr & reset: wait;
+				mode=wait & x & y: waitr;
+				mode=waitx & x: waitr;
+				mode=waity & y: waitr;
+				mode=wait & x: waity;
+				mode=wait & y: waitx;
+				TRUE: mode;
+		esac;
+		
+DEFINE
+		z:= mode!=waitr & next(mode) = waitr;
+
+LTLSPEC
+			F(mode=wait); --T
+LTLSPEC
+			G(F(mode=wait));
+LTLSPEC
+			F(mode=waitr);
+LTLSPEC
+			G(F(mode=waitr));
+LTLSPEC
+			G(G(F(x)) -> G(F(mode=wait)));
+LTLSPEC
+			G(F(x)) -> G(F(mode=wait)); 
+LTLSPEC
+			G(G(F(x) & F(y)) -> G(F(mode=wait)));
+LTLSPEC			
+			G(G(F(x) & F(y) & F(reset)) -> G(F(mode=wait))); --T			

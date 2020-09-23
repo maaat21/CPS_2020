@@ -1,0 +1,38 @@
+-- nuxmv -int
+-- read_model -i DoubleDelay.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -i -k 10
+-- nuxmv DoubleDelay.smv for requirement verification
+
+MODULE Delay(inp)
+
+VAR
+	x : 0..1;
+
+ASSIGN
+	init(x):= 0;
+   	next(x):= inp;
+
+DEFINE
+	out := x;
+	
+
+MODULE main
+
+VAR
+	inp : 0..1;
+	d1: Delay(inp);
+	d2: Delay(d1.out);
+
+DEFINE
+	out := d2.out;
+
+-- INVARSPEC (inp=0) -> X(X(out=0))
+-- INVARSPEC (inp=1) -> X(X(out=1))
+
+-- SPEC
+--		AG ((inp=0) -> X(X(out=0)))
+
+LTLSPEC
+		G (inp=0 -> X(X(out=0))) 

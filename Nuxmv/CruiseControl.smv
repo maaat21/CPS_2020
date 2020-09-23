@@ -1,0 +1,37 @@
+-- nuxmv -int
+-- read_model CruiseControl.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 10
+-- nuxmv CruiseControl.smv for requirement verification
+
+MODULE main
+
+VAR
+    cruise: boolean;
+    inc: boolean;
+    dec: boolean;
+    ds: 0..10; -- desired speed
+    speed: 0..10;
+    mode: {on, off};
+
+ASSIGN
+    init(speed):= 5;
+    next(speed):= {speed, (speed+1) mod 10, max((-1+speed), 1)};
+
+    init(mode):= on;
+    next(mode):= case
+        mode=off & cruise: on;
+        mode=on & cruise: off;
+        TRUE: mode;
+    esac;
+
+    init(ds):= 0;
+    next(ds):= case
+        mode=off & next(mode)=on: speed;
+        mode=on & inc & !dec: (ds+1) mod 10;
+        mode=on & dec & !inc: max(-1+ds, 0);
+        TRUE: ds;
+    esac;
+
+INVARSPEC (speed >= 0) & (speed <= 10)

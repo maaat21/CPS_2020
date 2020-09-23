@@ -1,0 +1,41 @@
+-- nuxmv -int
+-- read_model -i DelayInverter.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 10
+-- nuxmv DelayInverter.smv for requirement verification
+
+MODULE main
+
+VAR
+  di: DelayInverter;
+
+SPEC
+		AG (di.i.out=0 -> AX di.d.out=0)
+SPEC
+		AG (di.i.out=1 -> AX di.d.out=1)
+		
+MODULE Delay(inp)
+
+VAR
+	x : 0..1;
+
+ASSIGN
+	init(x):= 0;
+    next(x):= inp;
+
+DEFINE
+	out := x;
+	
+	
+MODULE Inverter(inp)
+
+DEFINE
+	out := 1-inp;
+	
+	
+MODULE DelayInverter
+
+VAR
+			d: Delay(i.out);
+			i: Inverter(d.out);

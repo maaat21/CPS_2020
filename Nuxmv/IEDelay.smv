@@ -1,0 +1,27 @@
+-- nuxmv -int IEDelay.smv
+-- read_model -i IEDelay.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 10
+
+MODULE main
+
+VAR
+  del: Delay(s);
+  s: 0..1;
+
+MODULE Delay(inp)
+
+VAR
+	x : 0..1;
+
+ASSIGN
+	init(x):= 0;
+    next(x):=
+		case
+			x != inp : inp;
+			-- Syntax error: case conditions are not exhaustive
+		esac;
+
+DEFINE
+	out := x;

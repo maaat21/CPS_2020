@@ -1,0 +1,39 @@
+-- nuxmv -int
+-- read_model -i SyncLatch.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 10
+-- nuxmv SyncLatch.smv for requirement verification
+
+MODULE main
+
+VAR
+  sl: SyncLatch(set, reset);
+  set: boolean;
+  reset: boolean;
+
+SPEC
+   AG (set&!reset -> AX(sl.out=TRUE));
+SPEC
+   AG (!set&reset -> AX(sl.out=FALSE));
+SPEC
+   AG (!set&!reset&sl.x -> AX(sl.x=TRUE));
+SPEC
+   AG (!set&!reset&!sl.x -> AX(sl.x=FALSE));
+			
+MODULE SyncLatch(s, r)
+
+VAR
+	x: boolean;
+
+ASSIGN
+    next(x):=
+		case
+			s&!r: TRUE;
+			!s&r: FALSE;
+			s&r: {TRUE,FALSE};
+			TRUE: x;
+		esac;
+				
+DEFINE
+	out:= x;

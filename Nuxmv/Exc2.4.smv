@@ -1,0 +1,38 @@
+-- nuxmv -int
+-- read_model -i Exc2.4.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 20
+-- nuxmv Exc2.4.smv for requirement verification
+
+MODULE main
+VAR
+	x: 1..5;
+	sum: 0..101;
+	ck: boolean;
+	cnt: 0..20;
+
+ASSIGN
+	init(sum):=0;
+	init(cnt):=0;
+
+	next(sum):=
+		case
+			ck=FALSE & cnt+1<20: (sum+x) mod 101; --mod necesse
+			TRUE: x;
+		esac;
+	next(cnt):=
+		case
+			ck=FALSE: (cnt+1) mod 20;
+			ck=TRUE: 0;
+		esac;
+
+DEFINE
+	y:=sum/(cnt+1);
+
+LTLSPEC
+	G(ck -> X(cnt=0));
+LTLSPEC
+	G(ck -> next(y)=x);
+-- LTLSPEC
+--	G(ck -> X(y)=x); ???

@@ -1,0 +1,29 @@
+-- nuxmv -int Delay_Main.smv
+-- read_model Delay_Main.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -i -k 10
+-- nuxmv Delay_Main.smv for requirement verification
+
+MODULE main
+
+VAR
+  del: Delay(s);
+  s: 0..1;
+
+SPEC
+   AG (s=0 -> AX(del.out=0));
+SPEC
+   AG (s=1 -> AX(del.out=1));
+
+MODULE Delay(inp)
+
+VAR
+			x : 0..1;
+
+ASSIGN
+	init(x):= 0;
+   next(x):= inp;
+
+DEFINE
+	out := x;

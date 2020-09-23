@@ -1,0 +1,18 @@
+-- nuxmv -int
+-- read_model -i SingleProcess.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -i -k 10
+
+MODULE main
+
+VAR
+   request : boolean;
+   state : {ready, busy};
+
+ASSIGN
+   init(state) := ready;
+   next(state) := case
+      state = ready & request = TRUE : busy;
+      TRUE : {ready, busy};
+   esac;

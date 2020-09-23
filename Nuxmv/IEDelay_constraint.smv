@@ -1,0 +1,33 @@
+-- nuxmv -int
+-- read_model -i IEDelay_constraint.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 10
+
+MODULE main
+
+VAR
+  del: Delay(s);
+  s: 0..1;
+
+
+MODULE Delay(inp)
+
+VAR
+	x : 0..1;
+
+ASSIGN
+	init(x):= 0;
+
+-- N.B. It is not equivalent!!! No deadlock
+TRANS
+	x != inp -> next(x) = inp;
+
+-- Syntax error: case conditions are not exhaustive
+-- TRANS
+-- case
+--	x != inp: next(x) = inp;
+-- esac;
+
+DEFINE
+	out := x;

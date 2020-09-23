@@ -1,0 +1,16 @@
+-- nuxmv -int
+-- read_model -i LTL_basic.smv
+-- go
+-- pick_state -i -v
+--simulate -v -r -k 10
+-- nuxmv LTL_basic.smv for requirement verification
+-- reset
+
+MODULE main
+VAR done: boolean;
+INIT !done
+TRANS done -> next(done)
+
+SPEC EG !done
+SPEC AF done
+LTLSPEC F(done)

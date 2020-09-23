@@ -1,0 +1,67 @@
+
+--http://disi.unitn.it/~agiordani/fm/L5/main.pdf
+
+-- nuxmv -int
+-- read_model -i Adder4bit.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 20
+-- nuxmv Adder4bit.smv for requirement verification
+-- reset
+
+MODULE adder_cell(in1, in2, cin)
+VAR
+	value: boolean;
+	cout: boolean;
+	
+ASSIGN
+	init(value) := FALSE;
+ 	init(cout) := FALSE;
+	next(value) := (in1 xor in2) xor cin; -- in1&in2&cin | in1&!in2&!cin | !in1&in2&!cin | !in1&!in2&cin;
+	next(cout) := in1 & in2 | in1 & cin | in2 & cin;
+
+DEFINE
+	out := value;
+	
+MODULE adder(op1, op2)
+VAR
+	bit[0] : adder_cell(op1[0], op2[0], FALSE);
+ 	bit[1] : adder_cell(op1[1], op2[1], bit[0].cout);
+ 	bit[2] : adder_cell(op1[2], op2[2], bit[1].cout);
+ 	bit[3] : adder_cell(op1[3], op2[3], bit[2].cout);	
+	
+DEFINE
+	sum[0] := bit[0].out;
+	sum[1] := bit[1].out;
+	sum[2] := bit[2].out;
+	sum[3] := bit[3].out;
+	ovf := bit[3].cout;
+
+	
+MODULE main
+VAR
+	a : adder(op1, op2);
+	op1: array 0..3 of boolean;
+	op2: array 0..3 of boolean;
+
+ASSIGN
+	init(op1[0]) := TRUE;
+	init(op1[1]) := TRUE;
+	init(op1[2]) := FALSE;
+	init(op1[3]) := TRUE;
+	init(op2[0]) := TRUE;
+	init(op2[1]) := FALSE;
+	init(op2[2]) := TRUE;
+	init(op2[3]) := FALSE;
+	
+	next(op1[0]) := op1[0];
+	next(op1[1]) := op1[1];
+	next(op1[2]) := op1[2];
+	next(op1[3]) := op1[3];
+	next(op2[0]) := op2[0];
+	next(op2[1]) := op2[1];
+	next(op2[2]) := op2[2];
+	next(op2[3]) := op2[3];
+	
+DEFINE
+	sum := toint(a.sum[0]) + 2*toint(a.sum[1]) + 4*toint(a.sum[2]) + 8*toint(a.sum[3]) + 16*toint(a.ovf);

@@ -1,0 +1,33 @@
+-- nuxmv -int Switch.smv
+-- read_model -i Switch.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 20
+-- reset
+-- nuxmv Switch.smv for requirement verification
+
+MODULE main
+
+VAR
+   mode : {OFF, ON};
+	 x : 0..10;
+   press: boolean;
+ASSIGN
+   init(mode) := OFF;
+			init(x) := 0;
+   next(mode) := 
+       case
+         mode = OFF & press = TRUE : ON;
+				 mode = ON & press = FALSE & x < 10 : ON;
+				 TRUE : OFF;
+       esac;
+   next(x) :=
+      case
+			   mode = ON & press = FALSE & x < 10 : x+1;
+         mode = ON & (press = TRUE | x >= 10) : 0;
+         TRUE : x;
+      esac;
+
+INVARSPEC (x <= 10);
+SPEC
+   AG (mode = ON -> AF(mode = OFF));

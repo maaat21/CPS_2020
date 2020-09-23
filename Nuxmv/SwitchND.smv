@@ -1,0 +1,40 @@
+-- nuxmv -int SwitchND.smv
+-- read_model -i SwitchND.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -i -k 20
+-- reset
+-- nuxmv SwitchND.smv for requirement verification
+
+MODULE main
+
+VAR
+  sw: Switch(press);
+  press: boolean;
+
+SPEC
+   AG (sw.mode = ON -> AF(sw.mode = OFF))
+SPEC
+	 AG sw.x <= 10
+
+MODULE Switch(press)
+
+VAR
+   mode: {OFF, ON};
+	 x: 0..11;
+ASSIGN
+   init(mode) := OFF;
+	 init(x) := 0;
+   next(mode) := 
+       case
+         mode = OFF & press = TRUE : ON;
+				 (mode = ON & press = FALSE & x < 10): ON;
+         (mode = ON & press = FALSE & x = 10): {OFF, ON};
+				 TRUE : OFF;
+       esac;
+   next(x) :=
+       case
+         mode != OFF & next(mode) = ON : (x+1) mod 12; -- cannot renove, with ranged values
+         mode = ON & next(mode)=OFF : 0;
+         TRUE : x;
+       esac;

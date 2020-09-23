@@ -1,0 +1,104 @@
+-- nuxmv -int
+-- read_model -i DistanceMeter.smv
+-- go
+-- pick_state -r -v
+-- simulate -v -r -k 6
+-- nuxmv DistanceMeter.smv for requirement verification
+
+MODULE node(id, inMsg)
+VAR
+    myId: 0..5;
+    known: array 0..4 of -1..4;
+    cnt: 0..5;
+    dist: 0..5;
+
+ASSIGN
+    init(myId):= id;
+    init(dist):= 0;
+
+    init(known[0]):= case
+        myId=0: 0;
+        TRUE: -1;
+    esac;
+    init(known[1]):= case
+        myId=1: 1;
+        TRUE: -1;
+    esac;
+    init(known[2]):= case
+        myId=2: 2;
+        TRUE: -1;
+    esac;
+    init(known[3]):= case
+        myId=3: 3;
+        TRUE: -1;
+    esac;
+    init(known[4]):= case
+        myId=4: 4;
+        TRUE: -1;
+    esac;
+
+    init(cnt):= 0;
+
+
+    next(known[0]):= max(known[0], inMsg[0]);
+    next(known[1]):= max(known[1], inMsg[1]);
+    next(known[2]):= max(known[2], inMsg[2]);
+    next(known[3]):= max(known[3], inMsg[3]);
+    next(known[4]):= max(known[4], inMsg[4]);
+
+    next(cnt):=case
+        cnt>=5: cnt;
+        TRUE: cnt+1;
+    esac;   
+
+    next(dist):= case
+        different: (cnt+1) mod 6; -- Necesse
+        TRUE: dist;
+    esac;
+
+DEFINE
+    different:= (known[0] != inMsg[0]) | (known[1] != inMsg[1]) | (known[2] != inMsg[2]) | (known[3] != inMsg[3]) | (known[4] != inMsg[4]);
+
+MODULE network(from0, from1, from2, from3, from4)
+
+VAR
+    to: array 0..5 of array 0..5 of -1..4;
+
+ASSIGN
+
+    -- to0 from 2
+    to[0][0] := from2[0];
+    to[0][1] := from2[1];
+    to[0][2] := from2[2];
+    to[0][3] := from2[3];
+    to[0][4] := -1;
+
+    -- to 1 from 0, 3
+    to[1][0] := max(from0[0], from3[0]);
+    to[1][1] := max(from0[1], from3[1]);
+    to[1][2] := max(from0[2], from3[2]);
+    to[1][3] := max(from0[3], from3[3]);
+    to[1][4] := -1;
+
+    -- to 2 from 1
+    to[2][0] := from1[0];
+    to[2][1] := from1[1];
+    to[2][2] := from1[2];
+    to[2][3] := from1[3];
+    to[2][4] := -1;
+
+    -- to 3 from 0
+    to[3][0] := from0[0];
+    to[3][1] := from0[1];
+    to[3][2] := from0[2];
+    to[3][3] := from0[3];
+    to[3][4] := -1;
+
+MODULE main
+VAR
+	nodes[0]: node(0, nwk.to[0]);
+    nodes[1]: node(1, nwk.to[1]);
+    nodes[2]: node(2, nwk.to[2]);
+    nodes[3]: node(3, nwk.to[3]);
+    empty: array 0..4 of -1..-1;
+    nwk: network(nodes[0].known, nodes[1].known, nodes[2].known, nodes[3].known, empty);

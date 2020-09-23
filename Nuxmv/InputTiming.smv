@@ -1,0 +1,25 @@
+-- nuxmv -int
+-- read_model -i InputTiming.smv
+-- go
+-- pick_state -v -i
+-- simulate -r -v -k 30
+-- reset
+
+MODULE main
+VAR
+	tick : boolean;
+	value : 0..10;
+	minute : boolean;
+ASSIGN
+	init(value) := 0;
+	init(minute) := FALSE;
+	next(value):= case
+		tick : (value + 1) mod 10;
+		TRUE : value;
+	esac;
+	next(minute) := case
+		next(value)=0 & tick: TRUE;
+		TRUE : FALSE;
+	esac;
+DEFINE
+	out := value;

@@ -1,0 +1,31 @@
+-- nuxmv -int BinaryCounter_straightforward.smv
+-- read_model -i BinaryCounter_straightforward.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 10
+-- reset
+
+MODULE counter_cell(carry_in)
+    VAR
+        value : boolean;
+        -- carry_out : boolean;
+    ASSIGN
+        init(value) := FALSE;
+        -- init(carry_out) := FALSE;
+        next(value) := case
+                value = FALSE & carry_in = TRUE: TRUE;
+                value = TRUE & carry_in = TRUE: FALSE;
+                TRUE: value;
+                esac;
+        
+    DEFINE
+        carry_out := value=TRUE & carry_in = FALSE;
+        -- next(carry_out) := value & carry_in;
+
+MODULE main
+    VAR
+        bit0 : counter_cell(TRUE);
+        bit1 : counter_cell(bit0.carry_out);
+        bit2 : counter_cell(bit1.carry_out);
+    DEFINE
+        output := toint(bit0.value) + 2*toint(bit1.value) + 4*toint(bit2.value);

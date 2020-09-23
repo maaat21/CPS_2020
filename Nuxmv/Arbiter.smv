@@ -1,0 +1,45 @@
+-- nuxmv -int
+-- read_model -i Arbiter.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 20
+-- nuxmv Arbiter.smv for requirement verification
+-- reset
+
+MODULE main
+
+VAR
+  arb: Arbiter(r1, r2);
+  r1: boolean;
+  r2: boolean;
+
+---- Commented just to leave space to INVARSPEC
+-- SPEC
+--   AG (r1 -> AF(arb.gr1));
+-- SPEC
+--   AG (r2 -> AF(arb.gr2));
+-- SPEC
+--   AG (r1 -> (arb.gr1 | arb.gr2)); -- Adding A before the internal parenthesis is syntax error
+
+INVARSPEC (arb.gr1 & arb.gr2) = FALSE
+INVARSPEC r1 -> (arb.gr1 | arb.gr2)
+
+MODULE Arbiter(r1, r2)
+
+VAR
+	gr1: boolean;
+	gr2: boolean;
+	tie_break: boolean;
+
+ASSIGN
+	tie_break:= {TRUE, FALSE};
+    gr1:=
+		case
+			r1 & (!r2 | tie_break): TRUE;
+			TRUE: FALSE;
+		esac;
+	gr2:=
+		case
+			r2 & (!r1 | tie_break=FALSE): TRUE;
+			TRUE: FALSE;
+		esac;

@@ -1,0 +1,154 @@
+-- nuxmv -int
+-- read_model -i TrainController.smv
+-- go
+-- pick_state -r -v
+-- simulate -v -r -k 6
+-- nuxmv TrainController.smv for requirement verification
+
+MODULE Controller1(e_out, w_out)
+
+VAR
+    east: {red, green};
+    west: {red, green};
+
+ASSIGN
+    init(east):= green;
+    init(west):= green;
+
+    next(east):= case
+        w_out=leave: green;
+        e_out!=arrive & w_out=arrive: red;
+        TRUE: east;
+    esac;
+
+    next(west):= case
+        e_out=leave: green;
+        e_out=arrive: red;
+        TRUE: west;
+    esac;
+
+
+DEFINE
+    e_sig:= east;
+    w_sig:= west;
+
+--------
+MODULE Controller2(e_out, w_out)
+
+VAR
+    east: {red, green};
+    west: {red, green};
+    near_e: boolean;
+    near_w: boolean;
+
+-- train out -> near -> signal -> bridge
+
+ASSIGN
+    init(east):= red;
+    init(west):= red;
+    init(near_e):= FALSE;
+    init(near_w):= FALSE;
+
+    next(near_e):= case
+        e_out= arrive: TRUE;
+        e_out= leave: FALSE;
+        TRUE: near_e;
+    esac;
+    next(near_w):= case
+        w_out= arrive: TRUE;
+        w_out= leave: FALSE;
+        TRUE: near_w;
+    esac;
+
+    next(east):= case
+        e_out=leave: red; -- Put before
+        near_e & west=red: green; -- si prende la precedenza
+        TRUE: east;
+    esac;
+
+    next(west):= case
+        w_out=leave: red;
+        near_w & next(east)=red: green; -- !near_e: green => OK; -- east=red => scontro
+        TRUE: west;
+    esac;
+
+DEFINE
+    e_sig:= east;
+    w_sig:= west;
+
+---------
+MODULE Train(signal)
+
+VAR
+    mode: {away, wait, bridge};
+    out: {none, leave, arrive}; -- Messo come DEFINE dà errore
+
+ASSIGN
+    init(mode):= away;
+    next(mode):=case
+        mode=away & out=arrive: wait;
+        mode=away: mode;
+        mode=wait & signal=green: bridge;
+        mode=wait & signal=red: mode;
+        mode=bridge & out=leave : away;
+        mode=bridge: mode;
+    esac;
+
+    out:= case
+        mode=away: {none, arrive};
+        mode=bridge: {none, leave};
+        mode=wait: none;
+    esac;
+
+-----------
+MODULE Monitor(out_1, out_2, signal_2)
+
+VAR
+    mode : {idle, wait1, wait2, err};
+
+ASSIGN
+    init(mode):= idle;
+
+    next(mode):= case
+        mode=idle & out_2=arrive: wait1;
+        mode=wait1 & out_1=leave: wait2;
+        mode=wait1 & signal_2=green: idle;
+        mode=wait2 & out_1=leave: err;
+        mode=wait2 & signal_2=green: idle;
+        TRUE: mode;
+    esac;
+
+-----------
+MODULE main
+
+VAR   
+    e_tr : Train(ctrl.e_sig);
+    w_tr : Train(ctrl.w_sig);
+    ctrl : Controller2(e_tr.out, w_tr.out);
+    mon : Monitor(e_tr.out, w_tr.out, ctrl.w_sig);
+    --mon : Monitor(w_tr.out, e_tr.out, ctrl.e_sig); -- Even more obvious ok
+
+INVARSPEC !(e_tr.mode=bridge & w_tr.mode=bridge)
+INVARSPEC !(mon.mode=err)
+
+INVARSPEC !(ctrl.w_sig=green & ctrl.e_sig=green)
+INVARSPEC (e_tr.mode=bridge -> ctrl.e_sig=green)
+INVARSPEC ((ctrl.near_e=FALSE -> e_tr.mode=away) & (e_tr.mode=away -> ctrl.near_e=FALSE))
+
+--INVARSPEC (e_tr.mode=wait & w_tr.mode=wait) -> X(X (e_tr.mode=bridge)), cannot use LTL operator
+
+LTLSPEC
+    G ((e_tr.mode=wait & w_tr.mode=wait) -> X(X (e_tr.mode=bridge))) -- The west could have arrived before or, more obvious we are in the next step, where e_sig is green
+LTLSPEC
+    G ((e_tr.mode=wait & w_tr.mode=wait) -> F (e_tr.mode=bridge)) -- Ok case west bridge forever later
+LTLSPEC
+    G ((e_tr.mode=wait & w_tr.mode=wait) -> F (w_tr.mode=bridge)) -- Ok case east bridge forever
+
+SPEC
+    AG ((e_tr.mode=wait & w_tr.mode=wait) -> AX(AX (e_tr.mode=bridge | w_tr.mode=bridge))) -- See LTLSPEC above
+SPEC    
+    AG ((e_tr.mode=wait & w_tr.mode=wait) -> (AF (e_tr.mode=bridge) & AF (w_tr.mode=bridge))) -- ???
+SPEC    
+    AG ((e_tr.mode=wait & w_tr.mode=wait) -> (AF (e_tr.mode=bridge))) -- Ok case bridge forever
+SPEC    
+    AG ((e_tr.mode=wait & w_tr.mode=wait) -> (AF (w_tr.mode=bridge))) -- Ok case bridge forever

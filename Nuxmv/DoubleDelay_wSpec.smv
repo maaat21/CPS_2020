@@ -1,0 +1,44 @@
+-- nuxmv -int Delay.smv
+-- read_model -i DoubleDelay.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -i -k 10
+-- nuxmv DoubleDelay.smv for requirement verification
+
+MODULE main
+
+VAR
+  dd: DoubleDelay(s);
+  s: 0..1;
+
+LTLSPEC
+			G (s=0 -> X(X(dd.out=0))) -- X means next
+		
+SPEC
+   AG (s=0 -> AF(dd.out=0)); -- AXX is syntax error
+SPEC
+   AG (s=1 -> AX(dd.out=1));
+
+
+
+MODULE Delay(inp)
+
+VAR
+			x : 0..1;
+
+ASSIGN
+			init(x):= 0;
+   next(x):= inp;
+
+DEFINE
+	out := x;
+	
+
+MODULE DoubleDelay(inp)
+
+VAR
+			d1: Delay(inp);
+			d2: Delay(d1.out);
+
+DEFINE
+	out := d2.out;

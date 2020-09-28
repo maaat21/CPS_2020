@@ -1,0 +1,25 @@
+-- nuxmv -int
+-- read_model -i Async_comp.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 10
+-- reset
+-- nuxmv Async_comp.smv for requirement verification
+
+MODULE cell(input)
+		VAR
+				val : {red, green, blue};
+		ASSIGN
+				next(val) := input;
+		FAIRNESS running
+
+
+MODULE main
+		VAR
+				c1 : process cell(c3.val);
+				c2 : process cell(c1.val);
+				c3 : process cell(c2.val);
+		ASSIGN
+				init(c1.val) := red;
+				init(c2.val) := green;
+				init(c3.val) := blue;

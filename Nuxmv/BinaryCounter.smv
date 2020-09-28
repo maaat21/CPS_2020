@@ -16,7 +16,7 @@ MODULE counter_cell(carry_in)
 
 MODULE main
     VAR
-        bit0 : counter_cell(TRUE);
+        bit0 : counter_cell(TRUE); -- Also bit[0], etc. would work
         bit1 : counter_cell(bit0.carry_out);
         bit2 : counter_cell(bit1.carry_out);
     DEFINE

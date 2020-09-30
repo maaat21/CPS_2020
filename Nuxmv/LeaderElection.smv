@@ -19,7 +19,7 @@ LTLSPEC
 	F(G(n0.status = lead | n1.status = lead | n2.status = lead | n3.status = lead))
 		
 LTLSPEC
-	F(G(toint(n0.leader) + toint(n1.leader) + toint(n2.leader) + toint(n3.leader) = 1))
+	F(G(toint(n0.leader) + toint(n1.leader) + toint(n2.leader) + toint(n3.leader) = 1)) -- use count()
 
 LTLSPEC
 	G(n0.status = lead -> G(n1.status != lead & n2.status != lead & n3.status != lead))

@@ -1,0 +1,79 @@
+
+--http://disi.unitn.it/~agiordani/fm/L5/main.pdf
+
+-- nuxmv -int
+-- read_model -i Adder4bit_reset.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 6
+-- nuxmv Adder4bit_reset.smv for requirement verification
+-- reset
+
+
+MODULE adder_cell(in1, in2, cin, res)
+VAR
+	value: boolean;
+	cout: boolean;
+	
+ASSIGN
+		init(value) := FALSE;
+ 	init(cout) := FALSE;
+		
+		next(value) := case
+				res : FALSE;
+				TRUE : (in1 xor in2) xor cin; -- in1&in2&cin | in1&!in2&!cin | !in1&in2&!cin | !in1&!in2&cin;
+		esac;
+		next(cout) := case
+				res : FALSE;
+				TRUE : in1 & in2 | in1 & cin | in2 & cin;
+		esac;
+		
+DEFINE
+	out := value;
+	
+MODULE adder(op1, op2, res)
+VAR
+	bit[0] : adder_cell(op1[0], op2[0], FALSE, res);
+ 	bit[1] : adder_cell(op1[1], op2[1], bit[0].cout, res);
+ 	bit[2] : adder_cell(op1[2], op2[2], bit[1].cout, res);
+ 	bit[3] : adder_cell(op1[3], op2[3], bit[2].cout, res);	
+	
+DEFINE
+	sum[0] := bit[0].out;
+	sum[1] := bit[1].out;
+	sum[2] := bit[2].out;
+	sum[3] := bit[3].out;
+	ovf := bit[3].cout;
+
+	
+MODULE main
+VAR
+	a : adder(op1, op2, res);
+	op1: array 0..3 of boolean;
+	op2: array 0..3 of boolean;
+	res : boolean;
+
+
+ASSIGN
+	
+	next(op1[0]) := op1[0];
+	next(op1[1]) := op1[1];
+	next(op1[2]) := op1[2];
+	next(op1[3]) := op1[3];
+	next(op2[0]) := op2[0];
+	next(op2[1]) := op2[1];
+	next(op2[2]) := op2[2];
+	next(op2[3]) := op2[3];
+	
+DEFINE
+	sum := toint(a.sum[0]) + 2*toint(a.sum[1]) + 4*toint(a.sum[2]) + 8*toint(a.sum[3]) + 16*toint(a.ovf);
+	
+	oper1 := toint(op1[0]) + 2*toint(op1[1]) + 4*toint(op1[2]) + 8*toint(op1[3]);
+	oper2 := toint(op2[0]) + 2*toint(op2[1]) + 4*toint(op2[2]) + 8*toint(op2[3]);
+	
+	LTLSPEC G (res -> X (sum = 0))
+	LTLSPEC G ((op1[3] & op2[3] & F(G res = FALSE)) -> (F(G (sum >= 16))))
+	LTLSPEC G (op1[0] & F(G res = FALSE) -> F(G (sum > 0)))
+	LTLSPEC G (op1[0] & G(F res = FALSE) -> G(F (sum > 0))) -- false
+	LTLSPEC G (op1[0] & !op2[0] & G(F res = FALSE) -> G(F (sum > 0))) -- true
+--  SPEC AG ((op1[3] & op2[3] & A(F(G res = FALSE))) -> (AFG (sum >= 16))) -- nuxmv limit?

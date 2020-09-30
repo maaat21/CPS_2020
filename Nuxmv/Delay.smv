@@ -9,11 +9,11 @@ MODULE main
 
 VAR
 	x : 0..1;
-   inp : 0..1;
+ inp : 0..1;
 
 ASSIGN
 	init(x):= 0;
-   next(x):= inp;
+ next(x):= inp;
 
 DEFINE
 	out := x;

@@ -1,0 +1,27 @@
+-- nuxmv -int
+-- read_model -i Modulo8_tick_constr.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 20
+-- reset
+-- nuxmv Modulo8_tick_constr.smv for requirement verification
+
+MODULE main
+
+		VAR
+				b0 : boolean;
+				b1 : boolean;
+				b2 : boolean;
+				tick : boolean;
+				--out : 0..7;
+
+		ASSIGN
+				init(b0) := FALSE;
+				init(b1) := FALSE;
+				init(b2) := FALSE;
+		
+		TRANS
+					toint(next(b0)) + 2*toint(next(b1)) + 4*toint(next(b2)) = (toint(b0) + 2*toint(b1) + 4*toint(b2) + toint(tick)) mod 8;
+		
+		DEFINE
+				out := toint(b0) + 2*toint(b1) + 4*toint(b2);

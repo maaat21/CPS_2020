@@ -5,7 +5,7 @@
 -- read_model -i Adder4bit.smv
 -- go
 -- pick_state -i -v
--- simulate -v -r -k 20
+-- simulate -v -r -k 6
 -- nuxmv Adder4bit.smv for requirement verification
 -- reset
 
@@ -65,3 +65,6 @@ ASSIGN
 	
 DEFINE
 	sum := toint(a.sum[0]) + 2*toint(a.sum[1]) + 4*toint(a.sum[2]) + 8*toint(a.sum[3]) + 16*toint(a.ovf);
+	
+	oper1 := toint(op1[0]) + 2*toint(op1[1]) + 4*toint(op1[2]) + 8*toint(op1[3]);
+	oper2 := toint(op2[0]) + 2*toint(op2[1]) + 4*toint(op2[2]) + 8*toint(op2[3]);

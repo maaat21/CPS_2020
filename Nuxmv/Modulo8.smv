@@ -1,0 +1,27 @@
+-- nuxmv -int
+-- read_model -i Modulo8.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 12
+-- reset
+-- nuxmv Modulo8.smv for requirement verification
+
+MODULE main
+
+		VAR
+				b0 : boolean;
+				b1 : boolean;
+				b2 : boolean;
+				out : 0..7;
+
+		ASSIGN
+				init(b0) := FALSE;
+				next(b0) := !b0;
+				
+				init(b1) := FALSE;
+				next(b1) := ((!b0 & b1) | (b0 & !b1));
+				
+				init(b2) := FALSE;
+				next(b2) := (!b2 & (b0 & b1)) | (b2 & !(b0 & b1));
+				
+				out := toint(b0) + 2*toint(b1) + 4*toint(b2);

@@ -18,11 +18,11 @@ ASSIGN
 	init(value) := FALSE;
  	-- init(cout) := FALSE;
 	next(value) := (in1 xor in2) xor cin; -- in1&in2&cin | in1&!in2&!cin | !in1&in2&!cin | !in1&!in2&cin;
-	-- cout := in1 & in2 | in1 & cin | in2 & cin;
+	-- next(cout) := in1 & in2 | in1 & cin | in2 & cin;
 
 DEFINE
 	out := value;
-    cout := in1 & in2 | in1 & cin | in2 & cin;
+ cout := in1 & in2 | in1 & cin | in2 & cin;
 	
 MODULE adder(op1, op2)
 VAR
@@ -66,3 +66,5 @@ ASSIGN
 	
 DEFINE
 	summ := toint(a.sum[0]) + 2*toint(a.sum[1]) + 4*toint(a.sum[2]) + 8*toint(a.sum[3]) + 16*toint(a.ovf);
+	oper1 := toint(op1[0]) + 2*toint(op1[1]) + 4*toint(op1[2]) + 8*toint(op1[3]);
+	oper2 := toint(op2[0]) + 2*toint(op2[1]) + 4*toint(op2[2]) + 8*toint(op2[3]);

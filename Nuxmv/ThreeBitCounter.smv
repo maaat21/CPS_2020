@@ -25,7 +25,7 @@ LTLSPEC
 LTLSPEC
    G (G(!start & F(inc)) -> F(tbc.out=7));
 
-
+-- Start is the reset
 MODULE OneBitCounter(inc, start)
 
 VAR

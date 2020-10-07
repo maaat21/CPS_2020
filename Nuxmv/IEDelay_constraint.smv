@@ -19,15 +19,15 @@ VAR
 ASSIGN
 	init(x):= 0;
 
--- N.B. It is not equivalent!!! No deadlock
-TRANS
-	x != inp -> next(x) = inp;
-
--- Syntax error: case conditions are not exhaustive
+-- Compiler error: "case conditions are not exhaustive", which corresponds to being not input enabled
 -- TRANS
 -- case
 --	x != inp: next(x) = inp;
 -- esac;
+
+-- N.B. It is not equivalent!!! No deadlock
+TRANS
+	x != inp -> next(x) = inp;
 
 DEFINE
 	out := x;

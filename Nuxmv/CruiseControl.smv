@@ -23,7 +23,7 @@ ASSIGN
     next(mode):= case
         mode=off & cruise: on;
         mode=on & cruise: off;
-        TRUE: mode;
+        TRUE: mode; -- If I omit, I get: "case conditions are not exhaustive", which corresponds to being not input enabled
     esac;
 
     init(ds):= 0;

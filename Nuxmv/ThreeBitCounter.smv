@@ -18,7 +18,7 @@ SPEC
    AG (tbc.out=7 -> AX(tbc.out=0)); -- Without inc, stays there forever...
 
 LTLSPEC
-   G (G(F(inc)) -> F(tbc.out=0)); -- Either though inc or through reset (start). -- Remove the first G means, it may happen that...
+   G (G(F(inc)) -> F(tbc.out=0)); -- Either through inc or through reset (start). -- Remove the first G means, it may happen that...
 
 LTLSPEC
    G (G(F(inc)) -> F(tbc.out=7));
@@ -34,7 +34,7 @@ VAR
 ASSIGN
 	init(x):= FALSE;
 			
-    next(x):=
+ next(x):=
 		case
 			start: FALSE;
 			TRUE: x xor inc;

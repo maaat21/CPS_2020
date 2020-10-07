@@ -1,0 +1,28 @@
+-- nuxmv -int
+-- read_model -i SecondToMinute.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 10
+-- nuxmv SecondToMinute.smv for requirement verification
+
+MODULE main
+
+VAR
+  x: 0..60;
+  second: boolean;
+
+ASSIGN		
+init(x):=0;
+next(x):= case
+		second: (x+1) mod 60;
+		TRUE: x;
+		esac;
+
+DEFINE
+		minute:= (x=59 & second);
+		
+LTLSPEC
+		G( G(F(second)) -> G(F(minute)))
+		
+INVARSPEC x>=0 & x <60
+		

@@ -17,10 +17,10 @@ VAR
 
 ASSIGN
 	init(x):= 0;
-    next(x):=
+ next(x):=
 		case
 			x != inp : inp;
-			-- Syntax error: case conditions are not exhaustive
+			-- Compiler error: "case conditions are not exhaustive", which corresponds to being not input enabled
 		esac;
 
 DEFINE

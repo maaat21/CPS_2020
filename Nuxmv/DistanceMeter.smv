@@ -5,6 +5,8 @@
 -- simulate -v -r -k 6
 -- nuxmv DistanceMeter.smv for requirement verification
 
+-- Exc. 2.23
+
 MODULE node(id, inMsg)
 VAR
     myId: 0..5;

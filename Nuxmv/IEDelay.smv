@@ -4,6 +4,8 @@
 -- pick_state -i -v
 -- simulate -v -r -k 10
 
+-- Lezione 2b slide 10
+
 MODULE main
 
 VAR

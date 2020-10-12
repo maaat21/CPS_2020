@@ -1,9 +1,9 @@
 -- nuxmv -int
--- read_model -i DistanceMeter.smv
+-- read_model -i Exc2.23.DistanceMeter.smv
 -- go
 -- pick_state -r -v
 -- simulate -v -r -k 6
--- nuxmv DistanceMeter.smv for requirement verification
+-- nuxmv Exc2.23.DistanceMeter.smv for requirement verification
 
 -- Exc. 2.23
 

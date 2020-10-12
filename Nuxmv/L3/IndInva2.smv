@@ -1,0 +1,34 @@
+-- nuxmv -int
+-- read_model -i IndInva2.smv
+-- go
+-- pick_state -r -v
+-- simulate -v -r -k 20
+-- nuxmv IndInva2.smv for requirement verification
+
+MODULE main
+
+VAR
+	x : -5..15;
+	y : -5..55;
+
+ASSIGN
+	init(x):= 0;
+	init(y):= 10;
+ next(x):= case
+		x<10: x+1;
+		TRUE: x;
+	esac;
+	next(y):= case
+		y<0: -1; -- To avoid compiler error
+		x<10: -1+y;
+		TRUE: y;
+	esac;
+
+INVARSPEC
+		y!=-1
+
+INVARSPEC
+		x>= 0 & x<=10
+		
+INVARSPEC
+		x>= 0 & x<=10 & x+y=10

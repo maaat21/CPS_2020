@@ -1,0 +1,21 @@
+-- nuxmv -int IndInva1.smv
+-- read_model -i IndInva1.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -i -k 10
+-- nuxmv IndInva1.smv for requirement verification
+
+MODULE main
+
+VAR
+	x : -5..15;
+
+ASSIGN
+	init(x):= 0;
+ next(x):= case
+		x<10: x+1;
+		TRUE: x;
+	esac;
+
+INVARSPEC
+		x>= 0 & x <= 10

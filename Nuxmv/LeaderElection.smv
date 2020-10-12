@@ -11,9 +11,9 @@ MODULE main
 VAR
     nwk: Network(n0.out, n1.out ,n2.out ,n3.out);
     n0: Node(3, nwk.o[0], 4);
-	n1: Node(4, nwk.o[1], 4);
-	n2: Node(1, nwk.o[2], 4);
-	n3: Node(2, nwk.o[3], 4);
+				n1: Node(4, nwk.o[1], 4);
+				n2: Node(1, nwk.o[2], 4);
+				n3: Node(2, nwk.o[3], 4);
 
 LTLSPEC
 	F(G(n0.status = lead | n1.status = lead | n2.status = lead | n3.status = lead))
@@ -29,6 +29,9 @@ LTLSPEC
 	G(n2.status = lead -> G(n0.status != lead & n1.status != lead & n3.status != lead))
 LTLSPEC
 	G(n3.status = lead -> G(n0.status != lead & n1.status != lead & n2.status != lead))
+
+INVARSPEC
+	toint(n0.leader) + toint(n1.leader) + toint(n2.leader) + toint(n3.leader) <= 1
 
 MODULE Node(myId, inp, N)
 		

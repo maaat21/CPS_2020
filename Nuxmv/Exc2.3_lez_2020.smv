@@ -1,0 +1,45 @@
+-- nuxmv -int
+-- read_model -i Exc2.3_lez_2020.smv
+-- go
+-- pick_state -i -v
+-- simulate -v -r -k 20
+-- nuxmv Exc2.3_lez_2020.smv for requirement verification
+
+MODULE main
+
+VAR
+x: boolean;
+y: boolean;
+reset: boolean;
+mode: {ini, wx, wy, wr};
+
+ASSIGN
+init(mode) := ini;
+
+next(mode):= case
+		mode=ini & x & !y: wy;
+		mode=ini & !x & y: wx;
+		mode=ini & x & y: wr;
+		mode=wy & y: wr;
+		mode=wx & x: wr;
+		mode=wr & reset: ini;
+		TRUE: mode;
+esac;
+
+DEFINE
+		z:=next(mode)=wr & mode!=wr;
+
+--INVARSPEC
+--		mode=ini
+		
+INVARSPEC
+		(mode=wr) -> (z=FALSE)
+		
+--INVARSPEC
+--		mode=ini & x -> next(mode)=wy
+		
+--LTLSPEC
+--		F(mode=wr)
+
+LTLSPEC
+			F(x) & F(y) -> F(mode=wr)

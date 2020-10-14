@@ -1,8 +1,8 @@
--- nuxmv -int IndInva1.smv
+-- nuxmv -int
 -- read_model -i IndInva1.smv
 -- go
--- pick_state -i -v
--- simulate -v -i -k 10
+-- pick_state -r -v
+-- simulate -v -r -k 20
 -- nuxmv IndInva1.smv for requirement verification
 
 MODULE main
@@ -18,4 +18,4 @@ ASSIGN
 	esac;
 
 INVARSPEC
-		x>= 0 & x <= 10
+		x>= 0 & x<=10

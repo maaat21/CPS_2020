@@ -68,7 +68,7 @@ ASSIGN
 
     next(west):= case
         w_out=leave: red;
-        near_w & next(east)=red: green; -- !near_e: green => OK; -- east=red => scontro
+        near_w & next(east)=red: green; -- near_w & !near_e: green => OK; -- east=red => scontro
         TRUE: west;
     esac;
 
@@ -136,6 +136,11 @@ INVARSPEC (e_tr.mode=bridge -> ctrl.e_sig=green)
 INVARSPEC ((ctrl.near_e=FALSE -> e_tr.mode=away) & (e_tr.mode=away -> ctrl.near_e=FALSE))
 
 --INVARSPEC (e_tr.mode=wait & w_tr.mode=wait) -> X(X (e_tr.mode=bridge)), cannot use LTL operator
+
+LTLSPEC
+				G(w_tr.mode=wait -> F(w_tr.mode=bridge))
+LTLSPEC
+				G(w_tr.mode=wait -> F(ctrl.w_sig=green))
 
 LTLSPEC
     G ((e_tr.mode=wait & w_tr.mode=wait) -> X(X (e_tr.mode=bridge))) -- The west could have arrived before or, more obvious we are in the next step, where e_sig is green

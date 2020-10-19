@@ -16,6 +16,9 @@ VAR
 				n3: Node(2, nwk.o[3], 4);
 
 LTLSPEC
+	F(G(n0.status != undec & n1.status != undec & n2.status != undec & n3.status != undec))
+
+LTLSPEC
 	F(G(n0.status = lead | n1.status = lead | n2.status = lead | n3.status = lead))
 		
 LTLSPEC

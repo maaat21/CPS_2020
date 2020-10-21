@@ -14,6 +14,10 @@ VAR
 				n1: Node(4, nwk.o[1], 4);
 				n2: Node(1, nwk.o[2], 4);
 				n3: Node(2, nwk.o[3], 4);
+				mon: Monitor(n0.status, n1.status ,n2.status ,n3.status);
+				
+INVARSPEC
+			mon.mode != err
 
 LTLSPEC
 	F(G(n0.status != undec & n1.status != undec & n2.status != undec & n3.status != undec))
@@ -91,3 +95,26 @@ ASSIGN
 	o[2][1]:=i3;
 	o[3][0]:=i2;
 	o[3][1]:=i1;
+	
+MODULE Monitor(s0, s1, s2, s3)
+	
+VAR
+		mode : {initial, n0, n1, n2, n3, err};
+		
+ASSIGN
+		init(mode) := initial;
+		
+		next(mode):= case
+				mode=initial & s0=lead & (s1=lead | s2=lead | s3=lead) : err;
+				mode=initial & s1=lead & (s2=lead | s3=lead) : err;
+				mode=initial & s1=lead & s2=lead & s3=lead : err;
+				mode=initial & s0=lead : n0;
+				mode=initial & s1=lead : n1;
+				mode=initial & s2=lead : n2;
+				mode=initial & s3=lead : n3;
+				mode=n0 & (s1=lead | s2=lead | s3=lead): err;
+				mode=n1 & (s0=lead | s2=lead | s3=lead): err;
+				mode=n2 & (s0=lead | s1=lead | s3=lead): err;
+				mode=n3 & (s0=lead | s1=lead | s2=lead): err;
+				TRUE: mode;
+		esac;

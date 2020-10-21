@@ -125,10 +125,11 @@ VAR
     e_tr : Train(ctrl.e_sig);
     w_tr : Train(ctrl.w_sig);
     ctrl : Controller2(e_tr.out, w_tr.out);
-    mon : Monitor(e_tr.out, w_tr.out, ctrl.w_sig);
+    --mon : Monitor(e_tr.out, w_tr.out, ctrl.w_sig);
     --mon : Monitor(w_tr.out, e_tr.out, ctrl.e_sig); -- Even more obvious ok
 
 INVARSPEC !(e_tr.mode=bridge & w_tr.mode=bridge)
+
 INVARSPEC !(mon.mode=err)
 
 INVARSPEC !(ctrl.w_sig=green & ctrl.e_sig=green)

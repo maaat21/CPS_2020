@@ -1,0 +1,10 @@
+scaricare il file zip di spin.
+Nella cartella bin prendere il file corrispondente al sistema operativo e all'architettura del proprio pc.
+Estrarre il file exe corrispondente in una cartella e rinominarlo spin.exe.
+Nella stessa cartella mettere anche il file ispin.tcl contenuto nella cartella optional_gui.
+Scaricare minGW: https://osdn.net/projects/mingw/releases/
+Eseguire il file scaricato.
+una volta finita l'installazione selezionare il pacchetto mingw32-gcc-g++-bin nel MinGW installation manager. Nel menù installation selezionare apply changes e attendere la fine dell'installazione.
+Scaricare ActiveTCL (necessario per ispin): https://www.tcl.tk/software/tcltk/download.html
+installare il file scaricato.
+aggiungere alle environment variables sia la cartella contenente spin.exe e ispin.tcl, sia la cartella C:\MinGW\bin.

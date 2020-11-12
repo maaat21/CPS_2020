@@ -9,8 +9,8 @@ byte u=0, v=0;
 
 do
 ::u=x;v=x;if
-										::u+v<=255 -> x=u+v;
-										::else -> x=1;
+										::u+v<=15 -> x=u+v;
+										::else -> break;
 										fi
 od
 }
@@ -25,7 +25,7 @@ init{
 }
 
 proctype Monitor(){
-		assert(!(x==37))
+		assert(!(x==13))
 }
 
-ltl p { [](x!=37) }
+ltl p { [](x!=13) }

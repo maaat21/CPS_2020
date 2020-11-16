@@ -9,7 +9,7 @@ byte n=8;
 printf("n=%d",n);
 
 do
-		:: turn[i] = 1;
+		:: turn[i] = 1; /*Non mi pare serva*/
 					turn[i] = turn[1-i] + 1;
 					(turn[1-i] == 0) || (turn[i] < turn[1-i]);
 					mutex++;

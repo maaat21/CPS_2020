@@ -1,11 +1,13 @@
 #define N           4
 #define soldier     byte
+/* Type definition */
 
 #define MSCTIME     printf("MSC: %d\n", time)
 #define IF          if ::
 #define FI          :: else fi
 #define max(x,y)    ((x>y) -> x : y)
 
+/* NB This macro "returns" a value */
 #define select_soldier(x) \
 if                        \
 :: here[0] -> x=0         \

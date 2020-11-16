@@ -24,6 +24,7 @@ init{
 	}
 }
 
+/* Assertion violation */
 proctype Monitor(){
 		assert(!(x==13))
 }

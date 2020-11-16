@@ -1,3 +1,4 @@
+/* Check invalid end-state */
 bit flag; /* signal entering/leaving the section */
 byte mutex; /* # procs in the critical section. */
 
@@ -20,3 +21,4 @@ proctype monitor() {
 }
 
 ltl p0	{ [] (mutex < 2) }
+ltl p1	{ <> (mutex > 0) }
